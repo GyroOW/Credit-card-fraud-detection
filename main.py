@@ -1,7 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import logging
-from data_validation.py import load_data
+
+from data_validation import load_data
 from pipeline import build_pipeline
 from model_training import train_model_with_tuning
 from model_evaluation import evaluate_model
@@ -17,8 +18,9 @@ def main():
         
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         
+        numeric_features = X.select_dtypes(include=['number']).columns.tolist()
         model = train_model_with_tuning(X_train, y_train)
-        pipeline = build_pipeline(model)
+        pipeline = build_pipeline(model, numeric_features)
         
         pipeline.fit(X_train, y_train)
         
