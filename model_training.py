@@ -1,17 +1,18 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint
 
 def train_model_with_tuning(X_train, y_train):
-    param_grid = {
-        'n_estimators': [50, 100, 150],
-        'max_depth': [None, 10, 20],
-        'min_samples_split': [2, 5, 10]
+    param_dist = {
+        'n_estimators': randint(50, 200),
+        'max_depth': [None, 10, 20, 30],
+        'min_samples_split': randint(2, 20)
     }
     
     rf = RandomForestClassifier(random_state=42)
-    grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5, scoring='roc_auc')
-    grid_search.fit(X_train, y_train)
+    randomized_search = RandomizedSearchCV(estimator=rf, param_distributions=param_dist, n_iter=100, cv=5, scoring='roc_auc', random_state=42)
+    randomized_search.fit(X_train, y_train)
     
-    best_rf = grid_search.best_estimator_
+    best_rf = randomized_search.best_estimator_
     
     return best_rf
